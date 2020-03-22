@@ -1,3 +1,5 @@
+using AzureFunction.ServiceBus.SendGrid.FunctionApp.CircuitBreakers;
+using AzureFunction.ServiceBus.SendGrid.FunctionApp.Exceptions;
 using AzureFunction.ServiceBus.SendGrid.FunctionApp.Interfaces.Services;
 using AzureFunction.ServiceBus.SendGrid.FunctionApp.Models;
 using AzureFunction.ServiceBus.SendGrid.FunctionApp.Services;
@@ -17,10 +19,27 @@ namespace AzureFunction.ServiceBus.SendGrid.FunctionApp.Functions
         [FunctionName("EmailServiceBusFunction")]
         public static void Run([ServiceBusTrigger("email-enviar", Connection = "AzureWebJobsServiceBus")]string emailQueue, ILogger log)
         {
-            log.LogInformation("Inicio do processamento");
-            RegisterServices();
-            Processar(emailQueue, log);
-            log.LogInformation("Fim do processamento");
+            CircuitBreaker circuitBreaker = new CircuitBreaker(5, 3000);
+
+            try
+            {
+                circuitBreaker.Execute(() =>
+                {
+                    log.LogInformation("Inicio do processamento");
+                    RegisterServices();
+                    Processar(emailQueue, log);
+                    log.LogInformation("Fim do processamento");
+
+                });
+            }
+            catch (CircuitBreakerOperationException circuitBreakerOperationException)
+            {
+                log.LogInformation(circuitBreakerOperationException.Message);
+            }
+            catch (OpenCircuitException openCircuitException)
+            {
+                log.LogInformation(openCircuitException.Message);
+            }
         }
 
         private static void RegisterServices()
