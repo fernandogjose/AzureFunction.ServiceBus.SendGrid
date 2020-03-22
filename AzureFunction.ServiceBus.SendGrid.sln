@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureFunction.ServiceBus.SendGrid.FunctionApp", "Src\AzureFunction.ServiceBus.SendGrid.FunctionApp\AzureFunction.ServiceBus.SendGrid.FunctionApp.csproj", "{6F9AC08F-902F-4FCA-AD78-D4E9B20C02C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzureFunction.ServiceBus.SendGrid.FunctionApp", "Src\AzureFunction.ServiceBus.SendGrid.FunctionApp\AzureFunction.ServiceBus.SendGrid.FunctionApp.csproj", "{6F9AC08F-902F-4FCA-AD78-D4E9B20C02C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServiceBus.Sender", "Src\ServiceBus.Sender\ServiceBus.Sender.csproj", "{7B265B43-0CE8-4D15-82C4-2EA656686E72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{6F9AC08F-902F-4FCA-AD78-D4E9B20C02C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F9AC08F-902F-4FCA-AD78-D4E9B20C02C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F9AC08F-902F-4FCA-AD78-D4E9B20C02C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B265B43-0CE8-4D15-82C4-2EA656686E72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B265B43-0CE8-4D15-82C4-2EA656686E72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B265B43-0CE8-4D15-82C4-2EA656686E72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B265B43-0CE8-4D15-82C4-2EA656686E72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
