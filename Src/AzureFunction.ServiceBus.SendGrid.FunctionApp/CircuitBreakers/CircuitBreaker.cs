@@ -38,19 +38,20 @@ namespace AzureFunction.ServiceBus.SendGrid.FunctionApp.CircuitBreakers
             if (timeout <= 0)
                 throw new ArgumentOutOfRangeException($"{timeout} deve ser maior que zero");
 
-            this.Threshold = threshold;
-            this.Timeout = timeout;
-            this.State = CircuitBreakerState.Closed;
+            Threshold = threshold;
+            Timeout = timeout;
+            State = CircuitBreakerState.Closed;
 
-            this.Timer = new Timer(timeout);
-            this.Timer.Enabled = false;
-            this.Timer.Elapsed += Timer_Elapsed;
-
+            Timer = new Timer(timeout)
+            {
+                Enabled = false
+            };
+            Timer.Elapsed += Timer_Elapsed;
         }
 
         public void Execute(Action action)
         {
-            if (this.State == CircuitBreakerState.Open)
+            if (State == CircuitBreakerState.Open)
             {
                 throw new OpenCircuitException("Circuit breaker está aberto");
             }
@@ -59,59 +60,56 @@ namespace AzureFunction.ServiceBus.SendGrid.FunctionApp.CircuitBreakers
             {
                 try
                 {
-                    this.Action = action;
-                    this.Action();
+                    Action = action;
+                    Action();
                 }
                 catch (Exception ex)
                 {
-                    if (this.State == CircuitBreakerState.HalfOpen)
+                    if (State == CircuitBreakerState.HalfOpen)
                     {
                         Trip();
                     }
-                    else if (this.FailureCount <= this.Threshold)
+                    else if (FailureCount <= Threshold)
                     {
-                        this.FailureCount++;
+                        FailureCount++;
 
                         //Ativa o Retry
-                        if (this.Timer.Enabled == false)
-                            this.Timer.Enabled = true;
+                        if (Timer.Enabled == false)
+                            Timer.Enabled = true;
                     }
-                    else if (this.FailureCount >= this.Threshold)
+                    else if (FailureCount >= Threshold)
                     {
                         Trip();
                     }
 
-                    throw new CircuitBreakerOperationException("Operation failed", ex);
+                    throw new CircuitBreakerOperationException("Envio de e-mail falhou", ex);
                 }
 
-                if (this.State == CircuitBreakerState.HalfOpen)
+                if (State == CircuitBreakerState.HalfOpen)
                 {
                     Reset();
                 }
 
-                if (this.FailureCount > 0)
+                if (FailureCount > 0)
                 {
-                    this.FailureCount--;
+                    FailureCount--;
                 }
             }
         }
 
         public void Reset()
         {
-            if (this.State != CircuitBreakerState.Closed)
+            if (State != CircuitBreakerState.Closed)
             {
-                Trace.WriteLine($"Circuito fechado");
                 ChangeState(CircuitBreakerState.Closed);
-
-                this.Timer.Stop();
+                Timer.Stop();
             }
         }
 
         private void Trip()
         {
-            if (this.State != CircuitBreakerState.Open)
+            if (State != CircuitBreakerState.Open)
             {
-                Trace.WriteLine($"Circuito Aberto");
                 ChangeState(CircuitBreakerState.Open);
             }
         }
@@ -122,19 +120,18 @@ namespace AzureFunction.ServiceBus.SendGrid.FunctionApp.CircuitBreakers
             {
                 try
                 {
-                    Trace.WriteLine($"Retry, Execução nº {this.FailureCount}");
-                    Execute(this.Action);
+                    Execute(Action);
                     Reset();
                 }
                 catch
                 {
-                    if (this.FailureCount > this.Threshold)
+                    if (FailureCount > Threshold)
                     {
                         Trip();
 
-                        this.Timer.Elapsed -= Timer_Elapsed;
-                        this.Timer.Enabled = false;
-                        this.Timer.Stop();
+                        Timer.Elapsed -= Timer_Elapsed;
+                        Timer.Enabled = false;
+                        Timer.Stop();
 
                     }
                 }
@@ -143,16 +140,13 @@ namespace AzureFunction.ServiceBus.SendGrid.FunctionApp.CircuitBreakers
 
         private void ChangeState(CircuitBreakerState state)
         {
-            this.State = state;
-            this.OnCircuitBreakerStateChanged(new EventArgs() { });
+            State = state;
+            OnCircuitBreakerStateChanged(new EventArgs() { });
         }
 
         private void OnCircuitBreakerStateChanged(EventArgs e)
         {
-            if (this.StateChanged != null)
-            {
-                StateChanged(this, e);
-            }
+            StateChanged?.Invoke(this, e);
         }
     }
 }
