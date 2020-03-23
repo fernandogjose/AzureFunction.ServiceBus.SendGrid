@@ -2,7 +2,6 @@
 using AzureFunction.ServiceBus.SendGrid.FunctionApp.Exceptions;
 using AzureFunction.ServiceBus.SendGrid.FunctionApp.Interfaces.CircuitBreakers;
 using System;
-using System.Diagnostics;
 using System.Timers;
 
 namespace AzureFunction.ServiceBus.SendGrid.FunctionApp.CircuitBreakers
